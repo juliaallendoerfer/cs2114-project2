@@ -8,11 +8,11 @@
  *
  * add() places the new entry at the FRONT of the chain, so entries added
  * with add() come back from toArray() in reverse order of insertion.
- * addToEnd() preserves insertion order.
+ * addToBack() preserves insertion order.
  *
  * Time complexity, where n is the number of entries:
  *   add              O(1)
- *   addToEnd         O(n)
+ *   addToBack         O(1)
  *   remove()         O(1)
  *   remove(T)        O(n)
  *   clear            O(1)
@@ -30,7 +30,8 @@
  */
 public class LinkedChain<T>
 {
-    private Node<T> firstNode;   // reference to the first node, or null
+    private Node<T> head;   // reference to the first node, or null
+    private Node<T> tail;
     private int numberOfEntries; // number of nodes in the chain
 
     /**
@@ -38,7 +39,8 @@ public class LinkedChain<T>
      */
     public LinkedChain()
     {
-        firstNode = null;
+        head = null;
+        tail = null;
         numberOfEntries = 0;
     }
 
@@ -52,8 +54,11 @@ public class LinkedChain<T>
     public boolean add(T newEntry)
     {
         requireNonNull(newEntry);
-        firstNode = new Node<T>(newEntry, firstNode);
+        head = new Node<T>(newEntry, head);
         numberOfEntries++;
+        if(numberOfEntries == 1) {
+            tail = head;
+        }
         return true;
     }
 
@@ -64,23 +69,11 @@ public class LinkedChain<T>
      * @return true
      * @throws IllegalArgumentException if newEntry is null
      */
-    public boolean addToEnd(T newEntry)
+    public boolean addToBack(T newEntry)
     {
         requireNonNull(newEntry);
-        Node<T> newNode = new Node<T>(newEntry);
-        if (firstNode == null)
-        {
-            firstNode = newNode;
-        }
-        else
-        {
-            Node<T> current = firstNode;
-            while (current.next != null)
-            {
-                current = current.next;
-            }
-            current.next = newNode;
-        }
+        tail.next = new Node<T>(newEntry, tail);
+        tail = tail.next;
         numberOfEntries++;
         return true;
     }
@@ -92,12 +85,12 @@ public class LinkedChain<T>
      */
     public T remove()
     {
-        if (firstNode == null)
+        if (head == null)
         {
             return null;
         }
-        T result = firstNode.data;
-        firstNode = firstNode.next;
+        T result = head.data;
+        head = head.next;
         numberOfEntries--;
         return result;
     }
@@ -110,18 +103,18 @@ public class LinkedChain<T>
      */
     public boolean remove(T anEntry)
     {
-        if (anEntry == null || firstNode == null)
+        if (anEntry == null || head == null)
         {
             return false;
         }
-        if (anEntry.equals(firstNode.data))
+        if (anEntry.equals(head.data))
         {
-            firstNode = firstNode.next;
+            head = head.next;
             numberOfEntries--;
             return true;
         }
-        Node<T> previous = firstNode;
-        Node<T> current = firstNode.next;
+        Node<T> previous = head;
+        Node<T> current = head.next;
         while (current != null)
         {
             if (anEntry.equals(current.data))
@@ -141,7 +134,7 @@ public class LinkedChain<T>
      */
     public void clear()
     {
-        firstNode = null;
+        head = null;
         numberOfEntries = 0;
     }
 
@@ -161,7 +154,7 @@ public class LinkedChain<T>
                 "Index " + index + " out of bounds for size "
                 + numberOfEntries);
         }
-        Node<T> current = firstNode;
+        Node<T> current = head;
         for (int i = 0; i < index; i++)
         {
             current = current.next;
@@ -193,7 +186,7 @@ public class LinkedChain<T>
             return 0;
         }
         int frequency = 0;
-        Node<T> current = firstNode;
+        Node<T> current = head;
         while (current != null)
         {
             if (anEntry.equals(current.data))
@@ -247,7 +240,7 @@ public class LinkedChain<T>
                 + " is too small for " + numberOfEntries + " entries");
         }
         int index = 0;
-        Node<T> current = firstNode;
+        Node<T> current = head;
         while (current != null)
         {
             values[index] = current.data;
@@ -267,7 +260,7 @@ public class LinkedChain<T>
     public String toString()
     {
         StringBuilder sb = new StringBuilder("[");
-        Node<T> current = firstNode;
+        Node<T> current = head;
         while (current != null)
         {
             sb.append(current.data);
