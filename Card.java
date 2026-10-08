@@ -7,7 +7,7 @@ public abstract class Card {
 
     private final String id;          // e.g., "MCQ-1", "PWR-2"
     private final String prompt;      // question text or power-up display description
-    private final String cardType;  // MCQ, TRUE_FALSE, FREE_RESPONSE, POWER_UP
+    private final CardType cardType;  // MCQ, TRUE_FALSE, FREE_RESPONSE, POWER_UP
 
     /**
      * Constructs a card with the given identity and display text.
@@ -17,7 +17,7 @@ public abstract class Card {
      * @param cardType category of the card
      * @throws IllegalArgumentException if id or prompt is null/blank, or cardType is null
      */
-    protected Card(String id, String prompt, String cardType) {
+    protected Card(String id, String prompt, CardType cardType) {
         if (id == null || id.isBlank()) {
             throw new IllegalArgumentException("Card id cannot be null or blank.");
         }
@@ -43,7 +43,7 @@ public abstract class Card {
     }
 
     /** Returns the card category enum. O(1) */
-    public String getCardType() {
+    public CardType getCardType() {
         return cardType;
     }
 
