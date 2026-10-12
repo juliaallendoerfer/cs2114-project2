@@ -28,6 +28,7 @@
  *
  * @param <T> the type of entries stored in the chain
  */
+import java.util.NoSuchElementException;
 public class LinkedChain<T>
 {
     private Node<T> head;   // reference to the first node, or null
@@ -71,10 +72,15 @@ public class LinkedChain<T>
      */
     public boolean addToBack(T newEntry)
     {
+        
         requireNonNull(newEntry);
-        tail.next = new Node<T>(newEntry, tail);
-        tail = tail.next;
+        Node<T> in = new Node<T> (newEntry);
+        in.next = tail;
+        tail = in;
         numberOfEntries++;
+        if(numberOfEntries == 1) {
+            head = tail;
+        }
         return true;
     }
 
@@ -82,12 +88,13 @@ public class LinkedChain<T>
      * Removes and returns the first entry in this chain, if possible.
      *
      * @return the removed entry, or null if the chain is empty
+     * @throws NoSuchElementException if the chain is empty
      */
-    public T remove()
+    public T removeFirst()
     {
-        if (head == null)
+        if (numberOfEntries == 0)
         {
-            return null;
+            throw new NoSuchElementException("Empty chain");
         }
         T result = head.data;
         head = head.next;
@@ -119,6 +126,10 @@ public class LinkedChain<T>
         {
             if (anEntry.equals(current.data))
             {
+                if(current.data.equals(tail.data)) 
+                {
+                    tail = previous;
+                }
                 previous.next = current.next;
                 numberOfEntries--;
                 return true;
@@ -135,6 +146,7 @@ public class LinkedChain<T>
     public void clear()
     {
         head = null;
+        tail = null;
         numberOfEntries = 0;
     }
 
@@ -144,9 +156,9 @@ public class LinkedChain<T>
      * @param index the zero-based position
      * @return the entry at that position
      * @throws IndexOutOfBoundsException if index is negative or
-     *         index is greater than or equal to size()
+     *         index is greater than or equal to getNumberOfEntries()
      */
-    public T get(int index)
+    public T getEntry(int index)
     {
         if (index < 0 || index >= numberOfEntries)
         {
@@ -160,6 +172,30 @@ public class LinkedChain<T>
             current = current.next;
         }
         return current.data;
+    }
+    
+    /**
+     * Gets the head of the chain.
+     * @return the head of the chain
+     * @throws NoSuchElementException if chain is empty
+     */
+    public T getHead() {
+        if(numberOfEntries == 0) {
+            throw new NoSuchElementException("Empty chain");
+        }
+        return head.data;
+    }
+    
+    /**
+     * Gets the tail of the chain.
+     * @return the tail of the chain
+     * @throws NoSuchElementException if chain is empty
+     */
+    public T getTail() {
+        if(numberOfEntries == 0) {
+            throw new NoSuchElementException("Empty chain");
+        }
+        return tail.data;
     }
 
     /**
@@ -197,13 +233,29 @@ public class LinkedChain<T>
         }
         return frequency;
     }
+    
+    /**
+     * Moves the first entry to the back of the chain
+     */
+    public void cycleFrontToBack() {
+        if(numberOfEntries == 0) {
+            throw new NoSuchElementException("Empty chain");
+        }
+        if(head == tail) {
+            return;
+        }
+        Node<T> temp = head;
+        head = head.next;
+        tail.next = temp;
+        tail = tail.next;
+    }
 
     /**
      * Gets the number of entries currently in this chain.
      *
      * @return the integer number of entries in the chain
      */
-    public int size()
+    public int getNumberOfEntries()
     {
         return numberOfEntries;
     }
@@ -223,7 +275,7 @@ public class LinkedChain<T>
      * first.
      *
      * @param values an array of the correct type to fill; it must have
-     *               length at least size()
+     *               length at least getNumberOfEntries()
      * @return the array containing all entries in the chain
      * @throws IllegalArgumentException if values is null or too small
      */
