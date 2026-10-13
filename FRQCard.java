@@ -4,7 +4,7 @@ import java.util.ArrayList;
  * Represents a free-response question (FRQ) that stores a set of acceptable
  * target answers. Answers are compared case-insensitively.
  */
-public class FreeResponseCard extends QuestionCard {
+public class FRQCard extends QuestionCard {
 
     private final ArrayList<String> acceptableAnswers;  // accepted answers
 
@@ -17,7 +17,7 @@ public class FreeResponseCard extends QuestionCard {
      * @throws IllegalArgumentException if the answer list is null, empty, or
      *                                  contains a null or blank entry
      */
-    public FreeResponseCard(String id, String prompt,
+    public FRQCard(String id, String prompt,
                             ArrayList<String> acceptableAnswers) {
         this(id, prompt, acceptableAnswers, DEFAULT_POINT_VALUE);
     }
@@ -32,7 +32,7 @@ public class FreeResponseCard extends QuestionCard {
      * @throws IllegalArgumentException if the answer list is invalid or the
      *                                  point value is not positive
      */
-    public FreeResponseCard(String id, String prompt,
+    public FRQCard(String id, String prompt,
                             ArrayList<String> acceptableAnswers,
                             int pointValue) {
         super(id, prompt, CardType.FREE_RESPONSE, pointValue);

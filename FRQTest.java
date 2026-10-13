@@ -3,12 +3,12 @@ import org.junit.Test;
 import java.util.ArrayList;
 
 /**
- * Tests the FreeResponseCard class.
+ * Tests the FRQCard class.
  */
-public class FreeResponseCardTest extends TestCase
+public class FRQCardTest extends TestCase
 {
     // ~ Fields ................................................................
-    private FreeResponseCard card;
+    private FRQCard card;
     private ArrayList<String> answers;
 
     /**
@@ -20,7 +20,7 @@ public class FreeResponseCardTest extends TestCase
         answers.add("Photosynthesis");
         answers.add("Light reactions");
 
-        card = new FreeResponseCard(
+        card = new FRQCard(
             "FRQ-1",
             "What process do plants use to convert light into energy?",
             answers);
@@ -89,7 +89,7 @@ public class FreeResponseCardTest extends TestCase
      */
     public void testCustomPointValue()
     {
-        FreeResponseCard hard = new FreeResponseCard(
+        FRQCard hard = new FRQCard(
             "FRQ-2",
             "Prompt",
             answers,
@@ -107,7 +107,7 @@ public class FreeResponseCardTest extends TestCase
         ArrayList<String> single = new ArrayList<String>();
         single.add("DNA");
 
-        FreeResponseCard dna = new FreeResponseCard("FRQ-3", "Prompt", single);
+        FRQCard dna = new FRQCard("FRQ-3", "Prompt", single);
 
         assertEquals(true, dna.checkAnswer("dna"));
         assertEquals(1, dna.getAcceptableAnswers().size());
@@ -175,7 +175,7 @@ public class FreeResponseCardTest extends TestCase
         ArrayList<String> messy = new ArrayList<String>();
         messy.add("  Cellular   RESPIRATION ");
 
-        FreeResponseCard other = new FreeResponseCard("FRQ-4", "Prompt", messy);
+        FRQCard other = new FRQCard("FRQ-4", "Prompt", messy);
 
         assertEquals(true, other.checkAnswer("cellular respiration"));
     }
@@ -243,7 +243,7 @@ public class FreeResponseCardTest extends TestCase
     {
         try
         {
-            new FreeResponseCard("FRQ-5", "Prompt", null);
+            new FRQCard("FRQ-5", "Prompt", null);
             fail("Expected IllegalArgumentException for null answers");
         }
         catch (IllegalArgumentException e)
@@ -260,7 +260,7 @@ public class FreeResponseCardTest extends TestCase
     {
         try
         {
-            new FreeResponseCard(
+            new FRQCard(
                 "FRQ-5",
                 "Prompt",
                 new ArrayList<String>());
@@ -282,7 +282,7 @@ public class FreeResponseCardTest extends TestCase
 
         try
         {
-            new FreeResponseCard("FRQ-5", "Prompt", answers);
+            new FRQCard("FRQ-5", "Prompt", answers);
             fail("Expected IllegalArgumentException for null answer entry");
         }
         catch (IllegalArgumentException e)
@@ -301,7 +301,7 @@ public class FreeResponseCardTest extends TestCase
 
         try
         {
-            new FreeResponseCard("FRQ-5", "Prompt", answers);
+            new FRQCard("FRQ-5", "Prompt", answers);
             fail("Expected IllegalArgumentException for blank answer entry");
         }
         catch (IllegalArgumentException e)
@@ -318,7 +318,7 @@ public class FreeResponseCardTest extends TestCase
     {
         try
         {
-            new FreeResponseCard("FRQ-5", "Prompt", answers, 0);
+            new FRQCard("FRQ-5", "Prompt", answers, 0);
             fail("Expected IllegalArgumentException for point value 0");
         }
         catch (IllegalArgumentException e)
