@@ -72,7 +72,6 @@ public class LinkedChain<T>
      */
     public boolean addToBack(T newEntry)
     {
-        
         requireNonNull(newEntry);
         Node<T> in = new Node<T> (newEntry);
         in.next = tail;
