@@ -16,6 +16,8 @@ First some of the naming conventions were changed to fit the naming in the spec 
 
 • What happened to your unknowns? Of the things you listed in your scope as not knowing how to do, which did you figure out, and which are still open?
 
+From our unknowns handling edge cases such as a chain with 1 or 2 unknowns was figured out as it now should be handled automatically in the chain. However, for the other unknowns we still do not know of what GUI packages we can utilize and how will they work with our other packages. Also, we still do not know how to safely handle the game state when out of questions with power-ups active and/or in the inventory.
+
 
 
 • What doesn't work yet? MVP features, bad-input cases, or tests that are missing or failing in this prototype.
