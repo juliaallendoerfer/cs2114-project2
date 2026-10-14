@@ -4,7 +4,7 @@ import org.junit.Test;
 /**
  * Tests the Card class.
  */
-public class CardTest extends student.TestCase
+public class CardTest extends TestCase
 {
     // ~ Fields ................................................................
     private Card card;

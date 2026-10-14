@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * Tests the MultipleChoiceCard class.
  */
-public class MultipleChoiceCardTest extends student.TestCase
+public class MultipleChoiceCardTest extends TestCase
 {
     // ~ Fields ................................................................
     private MultipleChoiceCard card;
