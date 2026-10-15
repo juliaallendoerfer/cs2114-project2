@@ -38,6 +38,9 @@ public class LinkedChainTest
             E = e;
         }
         assertNotNull(E);
+        chain1.add("Card B");
+        assertEquals("Card B", chain1.getHead());
+        assertEquals("Card A", chain1.getTail());
     }
     
     /**
