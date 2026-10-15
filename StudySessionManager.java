@@ -149,7 +149,7 @@ public class StudySessionManager {
         String correct = fields.get(4);
         String difficulty = fields.get(5);
         int points = parsePoints(fields.size() == 7 ? fields.get(6) : "");
-
+        
         switch (type) {
             case "MCQ":
                 return new MultipleChoiceCard(id, prompt, splitList(data),
@@ -172,6 +172,9 @@ public class StudySessionManager {
             default:
                 throw new IllegalArgumentException(
                     "Unknown card type \"" + fields.get(0) + "\".");
+        }
+        if(difficulty.toLowerCase() != "easy" || difficulty.toLowerCase() != "meduim" || difficulty.toLowerCase() != "hard") {
+            throw new IllegalArgumentException("Unknown difficulty \"" + difficulty + "\".");
         }
     }
 

@@ -153,7 +153,7 @@ public class ConsoleUI {
      */
     private static void displayQuestion(QuestionCard question)
     {
-        System.out.println(question.getDifficulty() + " question!\n");
+        System.out.println(question.getDifficulty().toLowerCase() + " question!\n");
         System.out.println(question.getPrompt());
 
         if (question instanceof MultipleChoiceCard)
