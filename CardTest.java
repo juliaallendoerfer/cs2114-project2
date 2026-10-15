@@ -1,4 +1,5 @@
-import student.TestCase;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Tests the Card class.
