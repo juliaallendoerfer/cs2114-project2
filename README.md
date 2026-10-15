@@ -32,18 +32,26 @@ Next steps:
 
 • What is left to finish the MVP? The remaining features and fixes, in the order you will do them.
 
-
+Replace the MVP's text-based Terminal interface with a fully interactive visual interface using Java GUI packages, testing bad CSV inputs in linked chain
 
 • Which stretch goals will you attempt? The ones from your scope you are committing to, and the ones you are dropping.
 
-
+Have already completed CSV stretch goal. Will focus on UI and a countdown timer into the study sessions to track and limit the time a player has per question or per game session. Add difficulty levels to cards. Are dropping more complex power up cards that involve adjusting LinkedChain implementation. 
 
 • What new tests will you need? The methods and bad-input cases the added work must cover.
 
-
+Create tests on CSV bad inputs - empty CSV, wrong format CSV etc.
 
 • Who does what? Which team member owns each remaining item.
 
+Caleb and Julia will work on creating the UI. Toshi will focus on countdown timer. Zachias will add difficulty cards. 
+
+For the presentation we will each develop or own slide and prepare to present on one aspect of our project.
+Presentation:
+What we Built: Caleb
+Demo: Toshi
+What went well/What didn't: Zachias
+GenAI Usage: Julia
 
 
 Attribution:
