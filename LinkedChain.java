@@ -73,13 +73,17 @@ public class LinkedChain<T>
     public boolean addToBack(T newEntry)
     {
         requireNonNull(newEntry);
-        Node<T> in = new Node<T> (newEntry);
-        in.next = tail;
-        tail = in;
-        numberOfEntries++;
-        if(numberOfEntries == 1) {
-            head = tail;
+        Node<T> newNode = new Node<T>(newEntry);
+        if (isEmpty())
+        {
+            head = newNode;
         }
+        else
+        {
+            tail.next = newNode;
+        }
+        tail = newNode;
+        numberOfEntries++;
         return true;
     }
 
@@ -97,6 +101,10 @@ public class LinkedChain<T>
         }
         T result = head.data;
         head = head.next;
+        if (head == null)
+        {
+            tail = null;
+        }
         numberOfEntries--;
         return result;
     }
@@ -116,6 +124,10 @@ public class LinkedChain<T>
         if (anEntry.equals(head.data))
         {
             head = head.next;
+            if (head == null)
+            {
+                tail = null;
+            }
             numberOfEntries--;
             return true;
         }
@@ -125,7 +137,7 @@ public class LinkedChain<T>
         {
             if (anEntry.equals(current.data))
             {
-                if(current.data.equals(tail.data)) 
+                if (current == tail)
                 {
                     tail = previous;
                 }
@@ -243,10 +255,11 @@ public class LinkedChain<T>
         if(head == tail) {
             return;
         }
-        Node<T> temp = head;
+        Node<T> first = head;
         head = head.next;
-        tail.next = temp;
-        tail = tail.next;
+        first.next = null;
+        tail.next = first;
+        tail = first;
     }
 
     /**

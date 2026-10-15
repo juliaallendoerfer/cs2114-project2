@@ -1,14 +1,30 @@
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class ConsoleUI {
-   public static void main(String[] args) {
-      Scanner scanner = new Scanner(System.in);
-      GameSession game = new GameSession();
-      loadSampleQuestions(game);
+    /**
+     * Runs the game, loading questions from a deck CSV file.
+     *
+     * @param args optional path to a deck CSV file (default "deck.csv")
+     */
+    public static void main(String[] args)
+    {
+        String deckFile = args.length > 0 ? args[0] : "deck.csv";
+        GameSession game = new GameSession();
+        if (!loadDeck(game, deckFile))
+        {
+            return;
+        }
+        if (game.isGameOver())
+        {
+            System.out.println("There are no questions in " + deckFile + ".");
+            return;
+        }
 
-      System.out.println("You have entered CardDash!");
-      while (!game.isGameOver())
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("You have entered CardDash!");
+        while (!game.isGameOver())
         {
             System.out.println("Choose a deck (1-3):");
 
@@ -62,75 +78,74 @@ public class ConsoleUI {
         System.out.println("You completed the game!");
         scanner.close();
     }
+
     /**
- * Adds six sample questions to the game.
- *
- * @param game the current game session
- */
-private static void loadSampleQuestions(GameSession game)
-{
-    // Deck 1: Multiple-choice questions
-
-    ArrayList<String> options1 = new ArrayList<>();
-    options1.add("3");
-    options1.add("4");
-    options1.add("5");
-    options1.add("6");
-
-    game.addQuestion(1, new MultipleChoiceCard(
-        "MC1",
-        "What is 2 + 2?",
-        options1,
-        2));
-
-
-    ArrayList<String> options2 = new ArrayList<>();
-    options2.add("Python");
-    options2.add("Java");
-    options2.add("HTML");
-    options2.add("CSS");
-
-    game.addQuestion(1, new MultipleChoiceCard(
-        "MC2",
-        "Which language is commonly used with the JVM?",
-        options2,
-        2));
-
-
-    // Deck 2: True/False questions
-
-    game.addQuestion(2, new TrueFalseCard(
-        "TF1",
-        "Java is an object-oriented programming language.",
-        true));
-
-    game.addQuestion(2, new TrueFalseCard(
-        "TF2",
-        "The Earth is flat.",
-        false));
-
-
-    // Deck 3: Free-response questions
-
-    ArrayList<String> answers1 = new ArrayList<>();
-    answers1.add("New York");
-    answers1.add("New York City");
-    answers1.add("NYC");
-
-    game.addQuestion(3, new FRQCard(
-        "FR1",
-        "Where is the Statue of Liberty located?",
-        answers1));
-
-
-    ArrayList<String> answers2 = new ArrayList<>();
-    answers2.add("extends");
-
-    game.addQuestion(3, new FRQCard(
-        "FR2",
-        "What Java keyword is used to inherit from a class?",
-        answers2));
+     * Loads the question cards from a deck CSV file into the game.
+     * Multiple-choice cards go in deck 1, true/false cards in deck 2, and
+     * free-response cards in deck 3. Power-up cards are skipped, since this
+     * game does not use them. Malformed lines are skipped with a warning.
+     *
+     * @param game     the current game session
+     * @param fileName path to the deck CSV file
+     * @return true if the file was found, false if not
+     */
+    private static boolean loadDeck(GameSession game, String fileName)
+    {
+        int lineNumber = 0;
+        try (Scanner file = new Scanner(new File(fileName)))
+        {
+            while (file.hasNextLine())
+            {
+                String line = file.nextLine().trim();
+                lineNumber++;
+                if (line.isEmpty() || line.startsWith("#")
+                    || line.toLowerCase().startsWith("type,"))
+                {
+                    continue;
+                }
+                try
+                {
+                    Card card = StudySessionManager.parseLine(line);
+                    if (card instanceof QuestionCard)
+                    {
+                        game.addQuestion(deckNumberFor(card.getCardType()),
+                            (QuestionCard) card);
+                    }
+                }
+                catch (IllegalArgumentException exception)
+                {
+                    System.out.println("Skipping line " + lineNumber + " of "
+                        + fileName + ": " + exception.getMessage());
+                }
+            }
+            return true;
+        }
+        catch (FileNotFoundException exception)
+        {
+            System.out.println("Could not find deck file: " + fileName);
+            return false;
+        }
     }
+
+    /**
+     * Returns the deck number (1-3) that holds questions of the given type.
+     *
+     * @param type the question's card type
+     * @return 1 for MCQ, 2 for true/false, 3 for free response
+     */
+    private static int deckNumberFor(CardType type)
+    {
+        switch (type)
+        {
+            case MCQ:
+                return 1;
+            case TRUE_FALSE:
+                return 2;
+            default:
+                return 3;
+        }
+    }
+
     /**
      * Displays a question and its answer options, if applicable.
      *
@@ -138,18 +153,18 @@ private static void loadSampleQuestions(GameSession game)
      */
     private static void displayQuestion(QuestionCard question)
     {
-    System.out.println(question.getPrompt());
+        System.out.println(question.getPrompt());
 
-    if (question instanceof MultipleChoiceCard)
-    {
-        MultipleChoiceCard mc =
-            (MultipleChoiceCard)question;
-
-        for (int i = 0; i < mc.getOptions().size(); i++)
+        if (question instanceof MultipleChoiceCard)
         {
-            System.out.println(
-                (i + 1) + ". " + mc.getOptions().get(i));
+            MultipleChoiceCard mc =
+                (MultipleChoiceCard)question;
+
+            for (int i = 0; i < mc.getOptions().size(); i++)
+            {
+                System.out.println(
+                    (i + 1) + ". " + mc.getOptions().get(i));
+            }
         }
     }
-}
 }

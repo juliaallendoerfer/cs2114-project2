@@ -18,10 +18,10 @@ public abstract class Card {
      * @throws IllegalArgumentException if id or prompt is null/blank, or cardType is null
      */
     protected Card(String id, String prompt, CardType cardType) {
-        if (id == null || id.isBlank()) {
+        if (id == null || id.trim().isEmpty()) {
             throw new IllegalArgumentException("Card id cannot be null or blank.");
         }
-        if (prompt == null || prompt.isBlank()) {
+        if (prompt == null || prompt.trim().isEmpty()) {
             throw new IllegalArgumentException("Card prompt cannot be null or blank.");
         }
         if (cardType == null) {
