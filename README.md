@@ -50,33 +50,33 @@ Attribution:
 
 | --- | --- | --- |
 
-| Card | null | null |
+| Card | Julia | Wrote |
 
-| CardTest | null | null |
+| CardTest | Julia | Wrote |
 
-| CardType | null | null |
+| CardType | Julia | Wrote |
 
-| FRQCard | null | null |
+| FRQCard | Julia | Wrote |
 
-| FRQTest | null | null |
+| FRQTest | Julia | Wrote |
 
 | LinkedChain | Caleb Terstegen | Revised |
 
 | LinkedChainTest | Caleb Terstegen | Wrote |
 
-| MultipleChoiceCard | null | null |
+| MultipleChoiceCard | Julia | Wrote |
 
-| MultipleChoiceCardTest | null | null |
+| MultipleChoiceCardTest | Julia | Wrote |
 
-| PowerUpCard | null | null |
+| PowerUpCard | Julia | Wrote |
 
-| PowerUpCardType | null | null |
+| PowerUpCardType | Julia | Wrote |
 
-| QuestionCard | null | null |
+| QuestionCard | Julia | Wrote |
 
-| TrueFalseCard | null | null |
+| TrueFalseCard | Julia | Wrote |
 
-| TrueFalseCardTest | null | null |
+| TrueFalseCardTest | Julia | Wrote |
 
 
 
