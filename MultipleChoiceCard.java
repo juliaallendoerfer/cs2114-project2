@@ -23,8 +23,8 @@ public class MultipleChoiceCard extends QuestionCard {
      */
     public MultipleChoiceCard(String id, String prompt,
                               ArrayList<String> options,
-                              int correctOptionIndex) {
-        this(id, prompt, options, correctOptionIndex, DEFAULT_POINT_VALUE);
+                              int correctOptionIndex, String difficulty) {
+        this(id, prompt, options, correctOptionIndex, difficulty, DEFAULT_POINT_VALUE);
     }
 
     /**
@@ -40,8 +40,8 @@ public class MultipleChoiceCard extends QuestionCard {
      */
     public MultipleChoiceCard(String id, String prompt,
                               ArrayList<String> options,
-                              int correctOptionIndex, int pointValue) {
-        super(id, prompt, CardType.MCQ, pointValue);
+                              int correctOptionIndex, String difficulty, int pointValue) {
+        super(id, prompt, CardType.MCQ, difficulty, pointValue);
 
         if (options == null || options.size() != NUMBER_OF_OPTIONS) {
             throw new IllegalArgumentException(

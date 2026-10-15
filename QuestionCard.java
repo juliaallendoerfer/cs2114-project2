@@ -10,6 +10,7 @@ public abstract class QuestionCard extends Card {
 
     private final int pointValue;  // base points for a correct answer
     private int attempts;          // times this question has been attempted
+    private String difficulty; //The difficulty of the question
 
     /**
      * Constructs a question card worth the default point value (100).
@@ -18,8 +19,8 @@ public abstract class QuestionCard extends Card {
      * @param prompt   the question text
      * @param cardType category of the card
      */
-    protected QuestionCard(String id, String prompt, CardType cardType) {
-        this(id, prompt, cardType, DEFAULT_POINT_VALUE);
+    protected QuestionCard(String id, String prompt, CardType cardType, String difficulty) {
+        this(id, prompt, cardType, difficulty, DEFAULT_POINT_VALUE);
     }
 
     /**
@@ -31,8 +32,8 @@ public abstract class QuestionCard extends Card {
      * @param pointValue base points awarded for a correct answer
      * @throws IllegalArgumentException if pointValue is not positive
      */
-    protected QuestionCard(String id, String prompt, CardType cardType,
-                           int pointValue) {
+    protected QuestionCard(String id, String prompt, CardType cardType, String difficulty, 
+                                                int pointValue) {
         super(id, prompt, cardType);
         if (pointValue <= 0) {
             throw new IllegalArgumentException(
@@ -58,6 +59,11 @@ public abstract class QuestionCard extends Card {
     /** Returns the number of attempts made on this card. O(1) */
     public int getAttempts() {
         return attempts;
+    }
+    
+    /** Returns the difficulty of the question */
+    public String getDifficulty() {
+        return difficulty;
     }
 
     /** Increments the attempt count for this card by one. O(1) */

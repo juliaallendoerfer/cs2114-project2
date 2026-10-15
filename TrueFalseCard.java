@@ -12,8 +12,8 @@ public class TrueFalseCard extends QuestionCard {
      * @param prompt        the statement to be judged true or false
      * @param correctAnswer the ground truth for the prompt
      */
-    public TrueFalseCard(String id, String prompt, boolean correctAnswer) {
-        this(id, prompt, correctAnswer, DEFAULT_POINT_VALUE);
+    public TrueFalseCard(String id, String prompt, boolean correctAnswer, String difficulty) {
+        this(id, prompt, correctAnswer, difficulty, DEFAULT_POINT_VALUE);
     }
 
     /**
@@ -26,8 +26,8 @@ public class TrueFalseCard extends QuestionCard {
      * @throws IllegalArgumentException if pointValue is not positive
      */
     public TrueFalseCard(String id, String prompt, boolean correctAnswer,
-                         int pointValue) {
-        super(id, prompt, CardType.TRUE_FALSE, pointValue);
+                         String difficulty, int pointValue) {
+        super(id, prompt, CardType.TRUE_FALSE, difficulty, pointValue);
         this.correctAnswer = correctAnswer;
     }
 

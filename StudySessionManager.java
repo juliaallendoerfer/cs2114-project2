@@ -127,7 +127,8 @@ public class StudySessionManager {
     /**
      * Builds one card from a line of the deck CSV file.
      *
-     * @param line a CSV line in the format type,id,prompt,data,correct,points
+     * @param line a CSV line in the format: type,id,prompt,data,correct,points, 
+     *                                  difficulty
      * @return the card the line describes
      * @throws IllegalArgumentException if the line is malformed or the card
      *                                  values are invalid
@@ -137,28 +138,29 @@ public class StudySessionManager {
             throw new IllegalArgumentException("Line cannot be null.");
         }
         ArrayList<String> fields = splitCsvLine(line);
-        if (fields.size() < 5 || fields.size() > 6) {
+        if (fields.size() < 6 || fields.size() > 7) {
             throw new IllegalArgumentException(
-                "Expected 5 or 6 fields but found " + fields.size() + ".");
+                "Expected 6 or 7 fields but found " + fields.size() + ".");
         }
         String type = fields.get(0).toUpperCase();
         String id = fields.get(1);
         String prompt = fields.get(2);
         String data = fields.get(3);
         String correct = fields.get(4);
-        int points = parsePoints(fields.size() == 6 ? fields.get(5) : "");
+        String difficulty = fields.get(5);
+        int points = parsePoints(fields.size() == 7 ? fields.get(6) : "");
 
         switch (type) {
             case "MCQ":
                 return new MultipleChoiceCard(id, prompt, splitList(data),
-                    parseNumber(correct, "Correct option"), points);
+                    parseNumber(correct, "Correct option"), difficulty, points);
             case "TF":
             case "TRUE_FALSE":
-                return new TrueFalseCard(id, prompt, parseBoolean(correct),
+                return new TrueFalseCard(id, prompt, parseBoolean(correct), difficulty,
                     points);
             case "FRQ":
             case "FREE_RESPONSE":
-                return new FRQCard(id, prompt, splitList(data), points);
+                return new FRQCard(id, prompt, splitList(data), difficulty, points);
             case "PWR":
             case "POWER_UP":
                 PowerUpCardType effect = parsePowerUpName(data);

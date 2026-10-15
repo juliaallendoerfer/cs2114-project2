@@ -14,12 +14,13 @@ public class FRQCard extends QuestionCard {
      * @param id                unique identifier for the card
      * @param prompt            the question text
      * @param acceptableAnswers one or more answers that count as correct
+     * @param difficulty the difficulty of the question
      * @throws IllegalArgumentException if the answer list is null, empty, or
      *                                  contains a null or blank entry
      */
     public FRQCard(String id, String prompt,
-                            ArrayList<String> acceptableAnswers) {
-        this(id, prompt, acceptableAnswers, DEFAULT_POINT_VALUE);
+                            ArrayList<String> acceptableAnswers, String difficulty) {
+        this(id, prompt, acceptableAnswers, difficulty, DEFAULT_POINT_VALUE);
     }
 
     /**
@@ -34,8 +35,8 @@ public class FRQCard extends QuestionCard {
      */
     public FRQCard(String id, String prompt,
                             ArrayList<String> acceptableAnswers,
-                            int pointValue) {
-        super(id, prompt, CardType.FREE_RESPONSE, pointValue);
+                            String difficulty, int pointValue) {
+        super(id, prompt, CardType.FREE_RESPONSE, difficulty, pointValue);
 
         if (acceptableAnswers == null || acceptableAnswers.isEmpty()) {
             throw new IllegalArgumentException(
