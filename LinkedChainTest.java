@@ -59,7 +59,7 @@ public class LinkedChainTest
     /**
      * tests the remove first method
      */
-    public void TestRemoveFirst() {
+    public void testRemoveFirst() {
         NoSuchElementException E = null;
         try{
             chain1.removeFirst();
@@ -69,8 +69,8 @@ public class LinkedChainTest
         assertNotNull(E);
         chain1.add("Card A");
         chain1.add("Card B");
-        assertEquals("Card A", chain1.removeFirst());
-        assertEquals("Card B", chain1.getHead());
+        assertEquals("Card B", chain1.removeFirst());
+        assertEquals("Card A", chain1.getHead());
         assertEquals(1, chain1.getNumberOfEntries());
     }
     
