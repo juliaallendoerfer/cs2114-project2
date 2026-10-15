@@ -1,0 +1,12 @@
+type,id,prompt,data,correct,points
+# Lists inside a field use '|'. Quote a field that contains a comma.
+MCQ,MCQ-1,What is the time complexity of adding to the front of a linked chain?,O(1)|O(log n)|O(n)|O(n^2),1,100
+TF,TF-1,A singly linked node stores a reference to the previous node.,,false,
+PWR,PWR-1,,DOUBLE_POINTS,,
+FRQ,FRQ-1,What process do plants use to turn sunlight into food?,photosynthesis,,150
+MCQ,MCQ-2,"Which keyword makes a class unable to be instantiated, but still subclassable?",final|static|abstract|private,3,
+PWR,PWR-2,,FIFTY_FIFTY,,
+TF,TF-2,Java generics are checked at compile time.,,true,
+FRQ,FRQ-2,What exception does removeFirst() throw on an empty chain?,NoSuchElementException|No Such Element Exception,,
+PWR,PWR-3,,SECOND_CHANCE,,
+MCQ,MCQ-3,Which interface method compares two objects for ordering?,equals|hashCode|compareTo|toString,3,
