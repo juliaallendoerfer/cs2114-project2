@@ -44,7 +44,7 @@ Create tests on CSV bad inputs - empty CSV, wrong format CSV etc.
 
 • Who does what? Which team member owns each remaining item.
 
-Caleb and Julia will work on creating the UI. Toshi will focus on countdown timer. Zachias will add difficulty cards. 
+Zachias and Julia will work on creating the UI. Toshi will focus on countdown timer. Caleb will add difficulty cards. 
 
 For the presentation we will each develop or own slide and prepare to present on one aspect of our project.
 Presentation:
