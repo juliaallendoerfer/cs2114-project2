@@ -22,6 +22,8 @@ From our unknowns handling edge cases such as a chain with 1 or 2 unknowns was f
 
 • What doesn't work yet? MVP features, bad-input cases, or tests that are missing or failing in this prototype.
 
+The linked chain implementation has some errors when adding multiple cards. Also, for the linked chain for the most part only the tests from the spec were added so there is more possible test cases to add. Finally, there isn’t many questions yet for the cards to have so more should be added.
+
 
 
 Next steps:
@@ -77,6 +79,4 @@ Attribution:
 | TrueFalseCard | Julia | Wrote |
 
 | TrueFalseCardTest | Julia | Wrote |
-
-
 
