@@ -58,9 +58,17 @@ Attribution:
 
 | CardType | Julia | Wrote |
 
+| ConsoleUI | Zachias | Wrote/Revised |
+
 | FRQCard | Julia | Wrote |
 
 | FRQTest | Julia | Wrote |
+
+| GameSession | Zachias | Wrote |
+
+| InputValidator | Zachias | Wrote |
+
+| InputValidatorTest | Zachias | Wrote |
 
 | LinkedChain | Caleb Terstegen | Revised |
 
