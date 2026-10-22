@@ -17,14 +17,15 @@ import java.util.Scanner;
  * matching TODO is done.
  *
  * Deck CSV format (one card per line, header and # comment lines ignored):
- *   type,id,prompt,data,correct,points
- *   MCQ,MCQ-1,What is 2 + 2?,1|2|3|4,4,100
- *   TF,TF-1,The sky is blue.,,true,
- *   FRQ,FRQ-1,Name the plant food process.,photosynthesis|photo synthesis,,
- *   PWR,PWR-1,,DOUBLE_POINTS,,
+ *   type,id,prompt,data,correct,difficulty,points
+ *   MCQ,MCQ-1,What is 2 + 2?,1|2|3|4,4,easy,100
+ *   TF,TF-1,The sky is blue.,,true,medium,
+ *   FRQ,FRQ-1,Name the plant food process.,photosynthesis|photo synthesis,,hard,
+ *   PWR,PWR-1,,DOUBLE_POINTS,,,
  * Lists inside a field are separated by '|'. Wrap a field in double quotes
- * if it contains a comma. The points column may be left blank to use the
- * default point value.
+ * if it contains a comma. Difficulty is easy, medium, or hard for question
+ * cards and may be left blank for power-ups. The points column may be left
+ * blank (or left off) to use the default point value.
  */
 public class StudySessionManager {
 
@@ -37,6 +38,12 @@ public class StudySessionManager {
     /** Command prefix the user types to activate a power-up, e.g. "use skip". */
     public static final String USE_COMMAND = "use ";
 
+    /** Default number of seconds the player has to answer a question. */
+    public static final int DEFAULT_TIME_LIMIT = 10;
+
+    /** Seconds left on the timer when the countdown starts printing. */
+    public static final int COUNTDOWN_START = 3;
+
     private final LinkedChain<Card> deck;  // active cards for the session
     private final Player player;           // the current player
     // TODO (Zachias): add the UI delegate once ConsoleUI exists
@@ -46,7 +53,8 @@ public class StudySessionManager {
     private boolean doublePointsActive;    // next correct answer is doubled
     private boolean secondChanceActive;    // next wrong answer may be retried
     private final Random random;           // picks the Fifty-Fifty decoy
-    private Scanner input;                 // TEMP: replaced by ConsoleUI
+    private int timeLimit;                 // seconds to answer a question
+    private TimedInput input;              // player input, read with a timer
 
     /**
      * Constructs a session with an empty deck and a new player.
@@ -87,6 +95,7 @@ public class StudySessionManager {
         this.doublePointsActive = false;
         this.secondChanceActive = false;
         this.random = new Random();
+        this.timeLimit = DEFAULT_TIME_LIMIT;
     }
 
     // ~ Deck loading ..........................................................
@@ -125,10 +134,12 @@ public class StudySessionManager {
     }
 
     /**
-     * Builds one card from a line of the deck CSV file.
+     * Builds one card from a line of the deck CSV file. The difficulty must
+     * be easy, medium, or hard for question cards and is ignored for
+     * power-ups. The points column is optional.
      *
-     * @param line a CSV line in the format: type,id,prompt,data,correct,points, 
-     *                                  difficulty
+     * @param line a CSV line in the format:
+     *             type,id,prompt,data,correct,difficulty[,points]
      * @return the card the line describes
      * @throws IllegalArgumentException if the line is malformed or the card
      *                                  values are invalid
@@ -173,9 +184,6 @@ public class StudySessionManager {
                 throw new IllegalArgumentException(
                     "Unknown card type \"" + fields.get(0) + "\".");
         }
-        if(difficulty.toLowerCase() != "easy" || difficulty.toLowerCase() != "meduim" || difficulty.toLowerCase() != "hard") {
-            throw new IllegalArgumentException("Unknown difficulty \"" + difficulty + "\".");
-        }
     }
 
     // ~ Game loop .............................................................
@@ -195,6 +203,8 @@ public class StudySessionManager {
         //       use power-ups / exit>);
         showMessage("Welcome to FlashClass! Type \"" + USE_COMMAND.trim()
             + " <power-up>\" to use a power-up or \"exit\" to quit.");
+        showMessage("You have " + timeLimit + " seconds to answer each "
+            + "question, or it counts as wrong.");
 
         while (isRunning) {
             if (deck.isEmpty()) {
@@ -208,7 +218,11 @@ public class StudySessionManager {
     /**
      * Draws the card at the front of the chain. Power-up cards go into the
      * player's inventory; question cards are shown and answered, re-prompting
-     * until the turn is over. O(1) per prompt.
+     * until the turn is over. Each question is timed: the player is told how
+     * long they have, a countdown prints for the last few seconds, and
+     * running out of time counts as a wrong answer. The timer keeps running
+     * through re-prompts and refused power-up commands, but restarts when a
+     * power-up is used or Second Chance grants a retry. O(1) per prompt.
      */
     public void runTurn() {
         Card card;
@@ -228,18 +242,46 @@ public class StudySessionManager {
         // TODO (Zachias): ui.displayHUD(player, deck.getNumberOfEntries());
         // TODO (Zachias): ui.displayCard(question);
         showQuestion(question);  // TEMP
+        long deadline = startTimer();
 
         boolean turnOver = false;
         while (!turnOver && isRunning) {
             // TODO (Zachias): String answer = ui.promptUserInput("> ");
-            String answer = readLine("> ");  // TEMP
+            String answer = readTimedLine("> ", deadline);  // TEMP
             if (answer == null) {
-                // input stream closed; treat it like "exit"
-                endSession(false);
+                if (input.isClosed()) {
+                    // input stream closed; treat it like "exit"
+                    endSession(false);
+                } else {
+                    handleTimeout(question);
+                    waitForEnter();
+                }
                 return;
             }
+            boolean hadSecondChance = secondChanceActive;
+            int powerUpsHeld = player.getInventory().size();
             turnOver = handleInput(question, answer);
+            boolean usedPowerUp = player.getInventory().size() < powerUpsHeld;
+            boolean spentSecondChance = hadSecondChance && !secondChanceActive;
+            if (!turnOver && (usedPowerUp || spentSecondChance)) {
+                // a power-up was used, or Second Chance granted a retry:
+                // either way the player gets a full timer again
+                deadline = resetTimer();
+            }
         }
+    }
+
+    /**
+     * Treats running out of time as a wrong answer: the attempt is counted,
+     * the streak resets, and the card moves to the back of the deck. An
+     * active Second Chance is not used up by a timeout. O(1)
+     *
+     * @param question the question that was not answered in time
+     */
+    public void handleTimeout(QuestionCard question) {
+        question.incrementAttempts();
+        showMessage("Time's up!");
+        handleIncorrectAnswer(question);
     }
 
     /**
@@ -321,10 +363,11 @@ public class StudySessionManager {
      */
     public void handleIncorrectAnswer(QuestionCard card) {
         player.resetStreak();
-        showMessage("Incorrect! This question will come back later.");
         if (deck.getNumberOfEntries() == 1) {
-            showMessage("This is the last card. Answer it correctly to "
-                + "finish the deck.");
+            showMessage("Incorrect! This is the last card. Answer it "
+                + "correctly to finish the deck.");
+        } else {
+            showMessage("Incorrect! This question will come back later.");
         }
         moveToBack(card);
     }
@@ -473,6 +516,26 @@ public class StudySessionManager {
         return secondChanceActive;
     }
 
+    /** Returns the number of seconds the player has per question. O(1) */
+    public int getTimeLimit() {
+        return timeLimit;
+    }
+
+    /**
+     * Sets the number of seconds the player has to answer each question.
+     * O(1)
+     *
+     * @param seconds the time limit in seconds
+     * @throws IllegalArgumentException if seconds is not positive
+     */
+    public void setTimeLimit(int seconds) {
+        if (seconds <= 0) {
+            throw new IllegalArgumentException(
+                "Time limit must be greater than zero.");
+        }
+        timeLimit = seconds;
+    }
+
     // ~ Private helpers .......................................................
 
     /**
@@ -562,15 +625,82 @@ public class StudySessionManager {
     }
 
     /**
-     * TEMP: reads one line of input until ConsoleUI.promptUserInput()
-     * exists. Returns null if there is no more input.
+     * Tells the player how long they have and starts the question timer.
+     *
+     * @return the time, in milliseconds, when the timer runs out
      */
-    private String readLine(String prompt) {
-        if (input == null) {
-            input = new Scanner(System.in);
-        }
+    private long startTimer() {
+        showMessage("You have " + timeLimit + " seconds to answer.");
+        return System.currentTimeMillis() + timeLimit * 1000L;
+    }
+
+    /**
+     * Tells the player the timer was reset and starts it again.
+     *
+     * @return the time, in milliseconds, when the new timer runs out
+     */
+    private long resetTimer() {
+        showMessage("Timer reset!");
+        return startTimer();
+    }
+
+    /**
+     * TEMP: reads one line of input before the deadline, printing a
+     * countdown ("3...", "2...", "1...") once COUNTDOWN_START seconds are
+     * left. Returns null if time runs out or there is no more input; check
+     * input.isClosed() to tell which.
+     *
+     * @param prompt   text shown before the player types
+     * @param deadline the time, in milliseconds, when the timer runs out
+     */
+    private String readTimedLine(String prompt, long deadline) {
+        TimedInput in = getInput();
         System.out.print(prompt);
-        return input.hasNextLine() ? input.nextLine() : null;
+        long remaining = deadline - System.currentTimeMillis();
+        while (remaining > 0) {
+            // the next whole second still ahead of us that gets printed,
+            // or 0 when the next thing to happen is the deadline itself
+            long nextCount = Math.min(COUNTDOWN_START, (remaining - 1) / 1000);
+            String line = in.readLine(remaining - nextCount * 1000);
+            if (line != null || in.isClosed()) {
+                return line;
+            }
+            if (nextCount > 0) {
+                System.out.println();
+                System.out.println(nextCount + "...");
+                System.out.print(prompt);
+            }
+            remaining = deadline - System.currentTimeMillis();
+        }
+        System.out.println();
+        return null;
+    }
+
+    /**
+     * TEMP: after a timeout, waits for the player to press Enter so a
+     * half-typed answer is not used for the next question. Ends the
+     * session if there is no more input.
+     */
+    private void waitForEnter() {
+        if (!isRunning || deck.isEmpty()) {
+            return;
+        }
+        System.out.print("Press Enter for the next question.");
+        if (getInput().readLine() == null) {
+            System.out.println();
+            endSession(false);
+        }
+    }
+
+    /**
+     * TEMP: returns the player input, reading System.in, until
+     * ConsoleUI.promptUserInput() exists.
+     */
+    private TimedInput getInput() {
+        if (input == null) {
+            input = new TimedInput(System.in);
+        }
+        return input;
     }
 
     /**

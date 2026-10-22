@@ -1,6 +1,8 @@
 import java.io.File;
 
 import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,10 +26,11 @@ public class StudySessionManagerTest extends TestCase
     public void setUp()
     {
         mcq = new MultipleChoiceCard("MCQ-1", "What is 2 + 2?",
-            new ArrayList<String>(Arrays.asList("1", "2", "3", "4")), 4);
-        tf = new TrueFalseCard("TF-1", "The sky is blue.", true);
+            new ArrayList<String>(Arrays.asList("1", "2", "3", "4")), 4,
+            "easy");
+        tf = new TrueFalseCard("TF-1", "The sky is blue.", true, "easy");
         frq = new FRQCard("FRQ-1", "Plant food process?",
-            new ArrayList<String>(Arrays.asList("Photosynthesis")));
+            new ArrayList<String>(Arrays.asList("Photosynthesis")), "easy");
         player = new Player();
     }
 
@@ -90,7 +93,7 @@ public class StudySessionManagerTest extends TestCase
     public void testParseMCQ()
     {
         Card card = StudySessionManager.parseLine(
-            "MCQ,MCQ-1,What is 2 + 2?,1|2|3|4,4,200");
+            "MCQ,MCQ-1,What is 2 + 2?,1|2|3|4,4,hard,200");
 
         assertEquals(true, card instanceof MultipleChoiceCard);
         MultipleChoiceCard parsed = (MultipleChoiceCard) card;
@@ -99,6 +102,7 @@ public class StudySessionManagerTest extends TestCase
         assertEquals(4, parsed.getCorrectOptionIndex());
         assertEquals("3", parsed.getOptions().get(2));
         assertEquals(200, parsed.getPointValue());
+        assertEquals("hard", parsed.getDifficulty());
     }
 
 
@@ -108,12 +112,13 @@ public class StudySessionManagerTest extends TestCase
     public void testParseTF()
     {
         Card card = StudySessionManager.parseLine(
-            "TF,TF-1,The sky is blue.,,TRUE,");
+            "TF,TF-1,The sky is blue.,,TRUE,Medium,");
 
         assertEquals(true, card instanceof TrueFalseCard);
         assertEquals(true, ((TrueFalseCard) card).getCorrectAnswer());
         assertEquals(QuestionCard.DEFAULT_POINT_VALUE,
             ((TrueFalseCard) card).getPointValue());
+        assertEquals("medium", ((TrueFalseCard) card).getDifficulty());
     }
 
 
@@ -124,7 +129,7 @@ public class StudySessionManagerTest extends TestCase
     public void testParseFRQ()
     {
         Card card = StudySessionManager.parseLine(
-            "FRQ,FRQ-1,Plant food process?,photosynthesis | photo synthesis,");
+            "FRQ,FRQ-1,Plant food process?,photosynthesis | photo synthesis,,easy");
 
         assertEquals(true, card instanceof FRQCard);
         assertEquals(2, ((FRQCard) card).getAcceptableAnswers().size());
@@ -137,7 +142,7 @@ public class StudySessionManagerTest extends TestCase
      */
     public void testParsePowerUp()
     {
-        Card card = StudySessionManager.parseLine("PWR,PWR-1,,double points,,");
+        Card card = StudySessionManager.parseLine("PWR,PWR-1,,double points,,,");
 
         assertEquals(true, card instanceof PowerUpCard);
         assertEquals(PowerUpCardType.DOUBLE_POINTS,
@@ -151,7 +156,7 @@ public class StudySessionManagerTest extends TestCase
     public void testParseQuotedPrompt()
     {
         Card card = StudySessionManager.parseLine(
-            "TF,TF-1,\"Yes, \"\"quotes\"\" work.\",,false,");
+            "TF,TF-1,\"Yes, \"\"quotes\"\" work.\",,false,easy,");
 
         assertEquals("Yes, \"quotes\" work.", card.getPrompt());
     }
@@ -163,14 +168,20 @@ public class StudySessionManagerTest extends TestCase
     public void testParseBadLines()
     {
         String[] badLines = {
-            "XYZ,X-1,Prompt,,true,",
+            "XYZ,X-1,Prompt,,true,easy,",
             "TF,TF-1,Prompt",
-            "TF,TF-1,Prompt,,maybe,",
-            "MCQ,MCQ-1,Prompt,a|b|c|d,five,",
-            "MCQ,MCQ-1,Prompt,a|b|c,1,",
-            "MCQ,MCQ-1,Prompt,a|b|c|d,1,-5",
-            "PWR,PWR-1,,NOT_A_POWER,,",
-            "TF,TF-1,\"Unclosed,,true,",
+            "TF,TF-1,Prompt,,true",
+            "TF,TF-1,Prompt,,true,easy,100,extra",
+            "TF,TF-1,Prompt,,maybe,easy,",
+            "TF,TF-1,Prompt,,true,,",
+            "TF,TF-1,Prompt,,true,meduim,",
+            "TF,TF-1,Prompt,,true,100,",
+            "MCQ,MCQ-1,Prompt,a|b|c|d,five,easy,",
+            "MCQ,MCQ-1,Prompt,a|b|c,1,easy,",
+            "MCQ,MCQ-1,Prompt,a|b|c|d,1,easy,-5",
+            "MCQ,MCQ-1,Prompt,a|b|c|d,1,easy,lots",
+            "PWR,PWR-1,,NOT_A_POWER,,,",
+            "TF,TF-1,\"Unclosed,,true,easy,",
         };
         for (String line : badLines)
         {
@@ -201,12 +212,12 @@ public class StudySessionManagerTest extends TestCase
         file.deleteOnExit();
         try (PrintWriter out = new PrintWriter(file))
         {
-            out.println("type,id,prompt,data,correct,points");
+            out.println("type,id,prompt,data,correct,difficulty,points");
             out.println("# a comment");
-            out.println("TF,TF-1,First,,true,");
+            out.println("TF,TF-1,First,,true,easy,");
             out.println("");
-            out.println("TF,TF-2,Broken,,maybe,");
-            out.println("PWR,PWR-1,,SKIP,,");
+            out.println("TF,TF-2,Broken,,maybe,easy,");
+            out.println("PWR,PWR-1,,SKIP,,,");
         }
 
         StudySessionManager session = new StudySessionManager();
@@ -233,6 +244,19 @@ public class StudySessionManagerTest extends TestCase
         assertEquals(0, session.loadDeck("no-such-file.csv"));
         assertEquals(true, session.getDeck().isEmpty());
         assertPrinted("Could not find deck file");
+    }
+
+
+    /**
+     * Tests that every card in the shipped deck.csv loads.
+     */
+    public void testLoadShippedDeck()
+    {
+        StudySessionManager session = new StudySessionManager();
+
+        assertEquals(10, session.loadDeck("deck.csv"));
+        assertEquals("MCQ-1", session.getDeck().getHead().getId());
+        assertEquals("MCQ-3", session.getDeck().getTail().getId());
     }
 
 
@@ -567,6 +591,217 @@ public class StudySessionManagerTest extends TestCase
         assertEquals(true, session.getDeck().isEmpty());
         assertEquals(310, player.getScore());
         assertPrinted("You cleared the deck!");
+        assertPrinted("You have 10 seconds to answer.");
+        // every answer came in at once, so no countdown or timeout
+        assertFalse(systemOut().getHistory().contains("3..."));
+        assertFalse(systemOut().getHistory().contains("Time's up!"));
+    }
+
+
+    /**
+     * Plays a game where the first question times out: the player is told
+     * the limit, sees the countdown from 3, and the timeout counts as a
+     * wrong answer. Takes about 6 seconds.
+     *
+     * @throws IOException if the input pipe cannot be set up
+     */
+    public void testFullGameTimeout() throws IOException
+    {
+        StudySessionManager session = sessionOf(mcq, tf);
+        session.setTimeLimit(4);
+        PipedOutputStream keyboard = new PipedOutputStream();
+        System.setIn(new PipedInputStream(keyboard));
+
+        // types nothing until well after the 4-second MCQ timer runs out
+        Thread typist = new Thread(() -> {
+            try
+            {
+                Thread.sleep(5500);
+                keyboard.write(multiline(
+                    "",        // Enter after "Time's up!"
+                    "true",    // TF right: 100
+                    "4")       // MCQ right on its second try: 100 + 10
+                    .concat("\n").getBytes());
+                keyboard.close();
+            }
+            catch (InterruptedException | IOException e)
+            {
+                // the test fails on its own assertions
+            }
+        });
+        typist.start();
+
+        session.startSession();
+
+        assertPrinted("You have 4 seconds to answer.");
+        assertPrinted("3...");
+        assertPrinted("2...");
+        assertPrinted("1...");
+        assertPrinted("Time's up!");
+        assertPrinted("Press Enter for the next question.");
+        assertPrinted("You cleared the deck!");
+        assertEquals(210, player.getScore());
+        assertEquals(2, player.getBestStreak());
+        assertEquals(2, mcq.getAttempts());
+        assertEquals(1, tf.getAttempts());
+    }
+
+
+    // ~ Timer .................................................................
+
+    /**
+     * Tests the default time limit and changing it.
+     */
+    public void testTimeLimit()
+    {
+        StudySessionManager session = sessionOf(mcq);
+
+        assertEquals(StudySessionManager.DEFAULT_TIME_LIMIT,
+            session.getTimeLimit());
+        assertEquals(10, session.getTimeLimit());
+        session.setTimeLimit(5);
+        assertEquals(5, session.getTimeLimit());
+    }
+
+
+    /**
+     * Tests that a time limit of zero or less is rejected.
+     */
+    public void testInvalidTimeLimit()
+    {
+        StudySessionManager session = sessionOf(mcq);
+        int[] badLimits = {0, -1};
+        for (int limit : badLimits)
+        {
+            try
+            {
+                session.setTimeLimit(limit);
+                fail("Expected IllegalArgumentException for: " + limit);
+            }
+            catch (IllegalArgumentException e)
+            {
+                // expected
+            }
+        }
+        assertEquals(10, session.getTimeLimit());
+    }
+
+
+    /**
+     * Tests that a timeout counts as a wrong answer: the attempt is counted,
+     * the streak resets, and the card moves to the back.
+     */
+    public void testHandleTimeout()
+    {
+        StudySessionManager session = sessionOf(mcq, tf);
+        player.incrementStreak();
+
+        session.handleTimeout(mcq);
+
+        assertEquals(1, mcq.getAttempts());
+        assertEquals(0, player.getStreak());
+        assertEquals(0, player.getScore());
+        assertOrder(session, tf, mcq);
+        assertPrinted("Time's up!");
+    }
+
+
+    /**
+     * Tests that a timeout does not use up an active Second Chance.
+     */
+    public void testTimeoutKeepsSecondChance()
+    {
+        player.addPowerUp(new PowerUpCard("PWR-1",
+            PowerUpCardType.SECOND_CHANCE));
+        StudySessionManager session = sessionOf(mcq, tf);
+        session.handleInput(mcq, "use second chance");
+
+        session.handleTimeout(mcq);
+
+        assertEquals(true, session.isSecondChanceActive());
+        assertOrder(session, tf, mcq);
+    }
+
+
+    /**
+     * Tests that using a power-up resets the timer and says so.
+     */
+    public void testPowerUpResetsTimer()
+    {
+        player.addPowerUp(new PowerUpCard("PWR-1",
+            PowerUpCardType.DOUBLE_POINTS));
+        StudySessionManager session = sessionOf(mcq);
+        setSystemIn(multiline("use double points", "4"));
+
+        session.startSession();
+
+        assertPrinted("Timer reset!\nYou have 10 seconds to answer.");
+        assertEquals(200, player.getScore());
+    }
+
+
+    /**
+     * Tests that a refused power-up command does not reset the timer, so
+     * typing commands cannot stall the clock.
+     */
+    public void testRefusedPowerUpKeepsTimer()
+    {
+        player.addPowerUp(new PowerUpCard("PWR-1",
+            PowerUpCardType.REVEAL_LETTER));
+        StudySessionManager session = sessionOf(mcq);
+        setSystemIn(multiline(
+            "use skip",           // not owned
+            "use reveal letter",  // only works on free-response
+            "4"));
+
+        session.startSession();
+
+        assertFalse(systemOut().getHistory().contains("Timer reset!"));
+        assertEquals(1, player.getInventory().size());
+        // 100 for the answer + 50 for the unused Reveal Letter at the end
+        assertEquals(150, player.getScore());
+    }
+
+
+    /**
+     * Tests that a power-up really gives the player more time: with a
+     * 2-second limit, an answer typed 2.7 seconds in still counts because a
+     * power-up was used at 1.2 seconds. Takes about 3 seconds.
+     *
+     * @throws IOException if the input pipe cannot be set up
+     */
+    public void testPowerUpExtendsTime() throws IOException
+    {
+        player.addPowerUp(new PowerUpCard("PWR-1",
+            PowerUpCardType.DOUBLE_POINTS));
+        StudySessionManager session = sessionOf(mcq);
+        session.setTimeLimit(2);
+        PipedOutputStream keyboard = new PipedOutputStream();
+        System.setIn(new PipedInputStream(keyboard));
+
+        Thread typist = new Thread(() -> {
+            try
+            {
+                Thread.sleep(1200);
+                keyboard.write("use double points\n".getBytes());
+                keyboard.flush();
+                Thread.sleep(1500);
+                keyboard.write("4\n".getBytes());
+                keyboard.close();
+            }
+            catch (InterruptedException | IOException e)
+            {
+                // the test fails on its own assertions
+            }
+        });
+        typist.start();
+
+        session.startSession();
+
+        assertFalse(systemOut().getHistory().contains("Time's up!"));
+        assertPrinted("Timer reset!");
+        assertPrinted("You cleared the deck!");
+        assertEquals(200, player.getScore());
     }
 
 

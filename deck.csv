@@ -1,12 +1,12 @@
 type,id,prompt,data,correct,difficulty,points
 # Lists inside a field use '|'. Quote a field that contains a comma.,,,,,easy,
-MCQ,MCQ-1,What is the time complexity of adding to the front of a linked chain?,O(1)|O(log n)|O(n)|O(n^2),1,easy,100
-TF,TF-1,A singly linked node stores a reference to the previous node.,,FALSE,easy,
+MCQ,MCQ-1,What is the best college town in the world?,Blacksburg|Nunya|Sunnyvale|Roanoke,1,easy,100
+TF,TF-1,The sun is hot.,,TRUE,easy,100
 PWR,PWR-1,,DOUBLE_POINTS,,easy,
-FRQ,FRQ-1,What process do plants use to turn sunlight into food?,photosynthesis,,easy,150
-MCQ,MCQ-2,"Which keyword makes a class unable to be instantiated, but still subclassable?",final|static|abstract|private,3,easy,
+FRQ,FRQ-1,What is taco cat backwards?,tacocat|taco cat|tac ocat,,medium,150
+MCQ,MCQ-2,What is the coolest bird?,pigeon|eagle|hokie|duck,3,medium,150
 PWR,PWR-2,,FIFTY_FIFTY,,easy,
-TF,TF-2,Java generics are checked at compile time.,,TRUE,easy,
-FRQ,FRQ-2,What exception does removeFirst() throw on an empty chain?,NoSuchElementException|No Such Element Exception,,easy,
+TF,TF-2,Blacksburg has predictable weather.,,FALSE,medium,150
+FRQ,FRQ-2,What is hokie stone made of?,limestone|dolomite|dolomite limestone,,hard,200
 PWR,PWR-3,,SECOND_CHANCE,,easy,
-MCQ,MCQ-3,Which interface method compares two objects for ordering?,equals|hashCode|compareTo|toString,3,easy,
+MCQ,MCQ-3,What is the largest desert in the world?,Sahara|Antarctica|Amazon|Gobi,2,hard,200

@@ -113,6 +113,4 @@ Attribution:
 
 | StudySessionManagerTest | Toshi | Wrote |
 
-| desk | Toshi | Wrote |
-
-| StackADT | Toshi | Imported |
+| deck.csv | Toshi | Wrote |

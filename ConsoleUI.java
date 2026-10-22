@@ -24,11 +24,17 @@ public class ConsoleUI {
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("You have entered CardDash!");
+        System.out.println("Type \"exit\" at any prompt to quit.");
         while (!game.isGameOver())
         {
             System.out.println("Choose a deck (1-3):");
 
-            String input = scanner.nextLine();
+            String input = readLine(scanner);
+            if (input == null)
+            {
+                quit(game, scanner);
+                return;
+            }
 
             try
             {
@@ -47,8 +53,13 @@ public class ConsoleUI {
 
                 System.out.println("Enter your answer:");
 
-                String answer =
-                    InputValidator.cleanAnswer(scanner.nextLine());
+                String rawAnswer = readLine(scanner);
+                if (rawAnswer == null)
+                {
+                    quit(game, scanner);
+                    return;
+                }
+                String answer = InputValidator.cleanAnswer(rawAnswer);
 
                 if (!InputValidator.isValidAnswer(answer))
                 {
@@ -76,6 +87,38 @@ public class ConsoleUI {
         }
 
         System.out.println("You completed the game!");
+        scanner.close();
+    }
+
+    /**
+     * Reads one line of input.
+     *
+     * @param scanner the input source
+     * @return the line, or null if input has ended or the player typed "exit"
+     */
+    private static String readLine(Scanner scanner)
+    {
+        if (!scanner.hasNextLine())
+        {
+            return null;
+        }
+        String line = scanner.nextLine();
+        if (line.trim().equalsIgnoreCase("exit"))
+        {
+            return null;
+        }
+        return line;
+    }
+
+    /**
+     * Ends the game early and shows the final score.
+     *
+     * @param game    the current game session
+     * @param scanner the input source to close
+     */
+    private static void quit(GameSession game, Scanner scanner)
+    {
+        System.out.println("Game ended. Final score: " + game.getScore());
         scanner.close();
     }
 

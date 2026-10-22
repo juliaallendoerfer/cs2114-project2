@@ -23,7 +23,8 @@ public class FRQCardTest extends TestCase
         card = new FRQCard(
             "FRQ-1",
             "What process do plants use to convert light into energy?",
-            answers);
+            answers,
+            "medium");
     }
 
 
@@ -93,9 +94,20 @@ public class FRQCardTest extends TestCase
             "FRQ-2",
             "Prompt",
             answers,
+            "hard",
             300);
 
         assertEquals(300, hard.getPointValue());
+        assertEquals("hard", hard.getDifficulty());
+    }
+
+
+    /**
+     * Tests that the difficulty is stored.
+     */
+    public void testGetDifficulty()
+    {
+        assertEquals("medium", card.getDifficulty());
     }
 
 
@@ -107,7 +119,7 @@ public class FRQCardTest extends TestCase
         ArrayList<String> single = new ArrayList<String>();
         single.add("DNA");
 
-        FRQCard dna = new FRQCard("FRQ-3", "Prompt", single);
+        FRQCard dna = new FRQCard("FRQ-3", "Prompt", single, "easy");
 
         assertEquals(true, dna.checkAnswer("dna"));
         assertEquals(1, dna.getAcceptableAnswers().size());
@@ -175,7 +187,7 @@ public class FRQCardTest extends TestCase
         ArrayList<String> messy = new ArrayList<String>();
         messy.add("  Cellular   RESPIRATION ");
 
-        FRQCard other = new FRQCard("FRQ-4", "Prompt", messy);
+        FRQCard other = new FRQCard("FRQ-4", "Prompt", messy, "easy");
 
         assertEquals(true, other.checkAnswer("cellular respiration"));
     }
@@ -243,7 +255,7 @@ public class FRQCardTest extends TestCase
     {
         try
         {
-            new FRQCard("FRQ-5", "Prompt", null);
+            new FRQCard("FRQ-5", "Prompt", null, "easy");
             fail("Expected IllegalArgumentException for null answers");
         }
         catch (IllegalArgumentException e)
@@ -263,7 +275,8 @@ public class FRQCardTest extends TestCase
             new FRQCard(
                 "FRQ-5",
                 "Prompt",
-                new ArrayList<String>());
+                new ArrayList<String>(),
+                "easy");
             fail("Expected IllegalArgumentException for empty answer list");
         }
         catch (IllegalArgumentException e)
@@ -282,7 +295,7 @@ public class FRQCardTest extends TestCase
 
         try
         {
-            new FRQCard("FRQ-5", "Prompt", answers);
+            new FRQCard("FRQ-5", "Prompt", answers, "easy");
             fail("Expected IllegalArgumentException for null answer entry");
         }
         catch (IllegalArgumentException e)
@@ -301,7 +314,7 @@ public class FRQCardTest extends TestCase
 
         try
         {
-            new FRQCard("FRQ-5", "Prompt", answers);
+            new FRQCard("FRQ-5", "Prompt", answers, "easy");
             fail("Expected IllegalArgumentException for blank answer entry");
         }
         catch (IllegalArgumentException e)
@@ -318,7 +331,7 @@ public class FRQCardTest extends TestCase
     {
         try
         {
-            new FRQCard("FRQ-5", "Prompt", answers, 0);
+            new FRQCard("FRQ-5", "Prompt", answers, "easy", 0);
             fail("Expected IllegalArgumentException for point value 0");
         }
         catch (IllegalArgumentException e)

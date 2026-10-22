@@ -1,11 +1,11 @@
 /**
  * Represents a special modifier card that can be drawn from the chain and
  * held in the player's inventory to modify the game state (for example,
- * Double Points, Second Chance, or Hint).
+ * Double Points, Second Chance, or Skip).
  */
 public class PowerUpCard extends Card {
 
-    private final PowerUpType effect;  // which power-up behavior this is
+    private final PowerUpCardType effect;  // which power-up behavior this is
     private final String description;  // how the power-up benefits the user
 
     /**
@@ -18,7 +18,7 @@ public class PowerUpCard extends Card {
      * @throws IllegalArgumentException if effect is null, description is
      *                                  null or blank, or id/prompt are invalid
      */
-    public PowerUpCard(String id, String prompt, PowerUpType effect,
+    public PowerUpCard(String id, String prompt, PowerUpCardType effect,
                        String description) {
         super(id, prompt, CardType.POWER_UP);
         if (effect == null) {
@@ -40,12 +40,12 @@ public class PowerUpCard extends Card {
      * @param effect the power-up behavior
      * @throws IllegalArgumentException if effect is null or id is invalid
      */
-    public PowerUpCard(String id, PowerUpType effect) {
+    public PowerUpCard(String id, PowerUpCardType effect) {
         this(id, defaultPrompt(effect), effect, defaultDescription(effect));
     }
 
     /** Returns the power-up effect enum. O(1) */
-    public PowerUpType getEffect() {
+    public PowerUpCardType getEffect() {
         return effect;
     }
 
@@ -57,7 +57,7 @@ public class PowerUpCard extends Card {
     /**
      * Returns the standard banner text for an effect.
      */
-    private static String defaultPrompt(PowerUpType effect) {
+    private static String defaultPrompt(PowerUpCardType effect) {
         if (effect == null) {
             throw new IllegalArgumentException("Power-up effect cannot be null.");
         }
@@ -80,7 +80,7 @@ public class PowerUpCard extends Card {
     /**
      * Returns the standard description for an effect.
      */
-    private static String defaultDescription(PowerUpType effect) {
+    private static String defaultDescription(PowerUpCardType effect) {
         if (effect == null) {
             throw new IllegalArgumentException("Power-up effect cannot be null.");
         }

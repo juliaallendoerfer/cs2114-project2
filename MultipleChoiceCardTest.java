@@ -29,7 +29,8 @@ public class MultipleChoiceCardTest extends TestCase
             "MCQ-1",
             "Which organelle produces most of the cell's ATP?",
             options,
-            1);
+            1,
+            "easy");
     }
 
 
@@ -108,6 +109,7 @@ public class MultipleChoiceCardTest extends TestCase
             "Prompt",
             options,
             4,
+            "hard",
             300);
 
         assertEquals(300, hard.getPointValue());
@@ -126,7 +128,8 @@ public class MultipleChoiceCardTest extends TestCase
                 "MCQ-X",
                 "Prompt",
                 options,
-                i);
+                i,
+                "easy");
 
             assertEquals(i, other.getCorrectOptionIndex());
         }
@@ -216,7 +219,7 @@ public class MultipleChoiceCardTest extends TestCase
     {
         try
         {
-            new MultipleChoiceCard("MCQ-3", "Prompt", null, 1);
+            new MultipleChoiceCard("MCQ-3", "Prompt", null, 1, "easy");
             fail("Expected IllegalArgumentException for null options");
         }
         catch (IllegalArgumentException e)
@@ -235,7 +238,7 @@ public class MultipleChoiceCardTest extends TestCase
 
         try
         {
-            new MultipleChoiceCard("MCQ-3", "Prompt", options, 1);
+            new MultipleChoiceCard("MCQ-3", "Prompt", options, 1, "easy");
             fail("Expected IllegalArgumentException for 3 options");
         }
         catch (IllegalArgumentException e)
@@ -254,7 +257,7 @@ public class MultipleChoiceCardTest extends TestCase
 
         try
         {
-            new MultipleChoiceCard("MCQ-3", "Prompt", options, 1);
+            new MultipleChoiceCard("MCQ-3", "Prompt", options, 1, "easy");
             fail("Expected IllegalArgumentException for 5 options");
         }
         catch (IllegalArgumentException e)
@@ -273,7 +276,7 @@ public class MultipleChoiceCardTest extends TestCase
 
         try
         {
-            new MultipleChoiceCard("MCQ-3", "Prompt", options, 1);
+            new MultipleChoiceCard("MCQ-3", "Prompt", options, 1, "easy");
             fail("Expected IllegalArgumentException for null option");
         }
         catch (IllegalArgumentException e)
@@ -292,7 +295,7 @@ public class MultipleChoiceCardTest extends TestCase
 
         try
         {
-            new MultipleChoiceCard("MCQ-3", "Prompt", options, 1);
+            new MultipleChoiceCard("MCQ-3", "Prompt", options, 1, "easy");
             fail("Expected IllegalArgumentException for blank option");
         }
         catch (IllegalArgumentException e)
@@ -309,7 +312,7 @@ public class MultipleChoiceCardTest extends TestCase
     {
         try
         {
-            new MultipleChoiceCard("MCQ-3", "Prompt", options, 0);
+            new MultipleChoiceCard("MCQ-3", "Prompt", options, 0, "easy");
             fail("Expected IllegalArgumentException for index 0");
         }
         catch (IllegalArgumentException e)
@@ -326,7 +329,7 @@ public class MultipleChoiceCardTest extends TestCase
     {
         try
         {
-            new MultipleChoiceCard("MCQ-3", "Prompt", options, 5);
+            new MultipleChoiceCard("MCQ-3", "Prompt", options, 5, "easy");
             fail("Expected IllegalArgumentException for index 5");
         }
         catch (IllegalArgumentException e)
@@ -343,7 +346,7 @@ public class MultipleChoiceCardTest extends TestCase
     {
         try
         {
-            new MultipleChoiceCard("MCQ-3", "Prompt", options, 1, 0);
+            new MultipleChoiceCard("MCQ-3", "Prompt", options, 1, "easy", 0);
             fail("Expected IllegalArgumentException for point value 0");
         }
         catch (IllegalArgumentException e)

@@ -12,11 +12,13 @@
  *
  * Time complexity, where n is the number of entries:
  *   add              O(1)
- *   addToBack         O(1)
- *   remove()         O(1)
+ *   addToBack        O(1)
+ *   removeFirst      O(1)
  *   remove(T)        O(n)
+ *   cycleFrontToBack O(1)
  *   clear            O(1)
- *   get              O(n)
+ *   getEntry         O(n)
+ *   getHead/getTail  O(1)
  *   contains         O(n)
  *   count            O(n)
  *   size             O(1)
@@ -88,9 +90,9 @@ public class LinkedChain<T>
     }
 
     /**
-     * Removes and returns the first entry in this chain, if possible.
+     * Removes and returns the first entry in this chain.
      *
-     * @return the removed entry, or null if the chain is empty
+     * @return the removed entry
      * @throws NoSuchElementException if the chain is empty
      */
     public T removeFirst()
@@ -246,7 +248,10 @@ public class LinkedChain<T>
     }
     
     /**
-     * Moves the first entry to the back of the chain
+     * Moves the first entry to the back of the chain. A chain with one
+     * entry is left unchanged. O(1)
+     *
+     * @throws NoSuchElementException if the chain is empty
      */
     public void cycleFrontToBack() {
         if(numberOfEntries == 0) {

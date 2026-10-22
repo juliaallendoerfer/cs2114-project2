@@ -21,12 +21,14 @@ public class TrueFalseCardTest extends TestCase
         trueCard = new TrueFalseCard(
             "TF-1",
             "Water boils at 100 degrees Celsius at sea level.",
-            true);
+            true,
+            "easy");
 
         falseCard = new TrueFalseCard(
             "TF-2",
             "The Sun orbits the Earth.",
-            false);
+            false,
+            "EASY");
     }
 
 
@@ -76,7 +78,8 @@ public class TrueFalseCardTest extends TestCase
      */
     public void testCustomPointValue()
     {
-        TrueFalseCard hard = new TrueFalseCard("TF-3", "Prompt", true, 250);
+        TrueFalseCard hard =
+            new TrueFalseCard("TF-3", "Prompt", true, "hard", 250);
 
         assertEquals(250, hard.getPointValue());
         assertEquals(true, hard.getCorrectAnswer());
@@ -90,12 +93,46 @@ public class TrueFalseCardTest extends TestCase
     {
         try
         {
-            new TrueFalseCard("TF-3", "Prompt", true, 0);
+            new TrueFalseCard("TF-3", "Prompt", true, "easy", 0);
             fail("Expected IllegalArgumentException for point value 0");
         }
         catch (IllegalArgumentException e)
         {
             // expected
+        }
+    }
+
+
+    /**
+     * Tests that the difficulty is stored in lowercase, whatever its case.
+     */
+    public void testGetDifficulty()
+    {
+        assertEquals("easy", trueCard.getDifficulty());
+        assertEquals("easy", falseCard.getDifficulty());
+        assertEquals("medium",
+            new TrueFalseCard("TF-3", "Prompt", true, " Medium ")
+                .getDifficulty());
+    }
+
+
+    /**
+     * Tests that a null, blank, or unknown difficulty throws an exception.
+     */
+    public void testInvalidDifficulty()
+    {
+        String[] badLevels = {null, "", "   ", "meduim", "expert"};
+        for (String level : badLevels)
+        {
+            try
+            {
+                new TrueFalseCard("TF-3", "Prompt", true, level);
+                fail("Expected IllegalArgumentException for: " + level);
+            }
+            catch (IllegalArgumentException e)
+            {
+                // expected
+            }
         }
     }
 
