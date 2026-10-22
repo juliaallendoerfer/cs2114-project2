@@ -132,7 +132,7 @@ public class ConsoleUI {
      * @param fileName path to the deck CSV file
      * @return true if the file was found, false if not
      */
-    private static boolean loadDeck(GameSession game, String fileName)
+    public static boolean loadDeck(GameSession game, String fileName)
     {
         int lineNumber = 0;
         try (Scanner file = new Scanner(new File(fileName)))
